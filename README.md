@@ -16,10 +16,11 @@ From the `neruok/llama-cpp-rs` fork, behind its `common` feature:
 
 ## How it builds
 
-The crate vendors llama.cpp's `common` source and builds the subset it needs
-with `cc`. It links `libllama` and the ggml libraries from `llama-cpp-sys-2`.
-The vendored source must match the llama.cpp commit that `llama-cpp-sys-2`
-pins.
+The crate uses llama.cpp as a git submodule and builds the `common` subset it
+needs with `cc`. It links `libllama` and the ggml libraries from
+`llama-cpp-sys-2`. The submodule is pinned to the llama.cpp commit that
+`llama-cpp-sys-2` pins. Run `git submodule update --init --depth 1` before a
+build.
 
 ## Dependency on raw handles
 

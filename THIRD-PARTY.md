@@ -12,14 +12,14 @@ speculative wrapper are ported from `llama-cpp-2`.
 - License: MIT OR Apache-2.0
 - MIT copyright: Copyright (c) Dial AI
 
-## Vendored llama.cpp `common` source
+## llama.cpp submodule
 
-The `llama.cpp/` tree in this repository is a subset of llama.cpp. It is
-vendored to build the `common` helpers against the `llama-cpp-sys-2` `libllama`
+`llama.cpp/` is a git submodule pinned to the commit that `llama-cpp-sys-2`
+pins. Its `common` sources are built against the `llama-cpp-sys-2` `libllama`
 and ggml libraries.
 
 - Project: `llama.cpp` (https://github.com/ggml-org/llama.cpp)
 - License: MIT
 - Copyright: Copyright (c) 2023-2026 The ggml authors
 
-The full llama.cpp license text is kept at `llama.cpp/LICENSE`.
+The full llama.cpp license text is in the submodule at `llama.cpp/LICENSE`.
