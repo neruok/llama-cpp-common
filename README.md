@@ -29,4 +29,5 @@ fork pin above carries them.
 
 ## License
 
-MIT OR Apache-2.0.
+MIT OR Apache-2.0, Copyright (c) 2026 neruok. See `THIRD-PARTY.md` for the
+notices of the derived and vendored code.
