@@ -9,8 +9,8 @@ repository = "https://github.com/neruok/llama-cpp-common"
 [dependencies]
 # The fork pin carries the raw-handle accessors this crate needs. `common` is
 # disabled because this crate builds the `common` helpers itself.
-llama-cpp-2 = { git = "https://github.com/neruok/llama-cpp-rs", rev = "3aa810f0976978d135b22ced1a0b15a41f48b7d1", default-features = false, features = ["openmp"] }
-llama-cpp-sys-2 = { git = "https://github.com/neruok/llama-cpp-rs", rev = "3aa810f0976978d135b22ced1a0b15a41f48b7d1", default-features = false, features = ["openmp"] }
+llama-cpp-2 = { git = "https://github.com/neruok/llama-cpp-rs", rev = "50ec98f2d30451fa18f883acda990505369c2714", default-features = false, features = ["openmp"] }
+llama-cpp-sys-2 = { git = "https://github.com/neruok/llama-cpp-rs", rev = "50ec98f2d30451fa18f883acda990505369c2714", default-features = false, features = ["openmp"] }
 thiserror = "2"
 
 [build-dependencies]

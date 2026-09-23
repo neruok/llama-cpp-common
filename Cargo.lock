@@ -201,7 +201,7 @@ dependencies = [
 [[package]]
 name = "llama-cpp-2"
 version = "0.1.157"
-source = "git+https://github.com/neruok/llama-cpp-rs?rev=3aa810f0976978d135b22ced1a0b15a41f48b7d1#3aa810f0976978d135b22ced1a0b15a41f48b7d1"
+source = "git+https://github.com/neruok/llama-cpp-rs?rev=50ec98f2d30451fa18f883acda990505369c2714#50ec98f2d30451fa18f883acda990505369c2714"
 dependencies = [
  "encoding_rs",
  "enumflags2",
@@ -224,7 +224,7 @@ dependencies = [
 [[package]]
 name = "llama-cpp-sys-2"
 version = "0.1.157"
-source = "git+https://github.com/neruok/llama-cpp-rs?rev=3aa810f0976978d135b22ced1a0b15a41f48b7d1#3aa810f0976978d135b22ced1a0b15a41f48b7d1"
+source = "git+https://github.com/neruok/llama-cpp-rs?rev=50ec98f2d30451fa18f883acda990505369c2714#50ec98f2d30451fa18f883acda990505369c2714"
 dependencies = [
  "bindgen",
  "cc",

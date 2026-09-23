@@ -1,11 +1,12 @@
-//! Build the llama.cpp `common` sources from the `llama.cpp` submodule and the
-//! `llama_rs_*` wrapper.
+//! Build the llama.cpp `common` sources from the tree that `llama-cpp-sys-2`
+//! exports, and the `llama_rs_*` wrapper.
 //!
-//! The wrapper links against the `libllama` and ggml libraries that
-//! `llama-cpp-sys-2` builds. The submodule is pinned to the llama.cpp revision
-//! that `llama-cpp-sys-2` pins.
+//! `llama-cpp-sys-2` exports its pinned llama.cpp source tree as
+//! `DEP_LLAMA_LLAMA_CPP_SOURCE` and `DEP_LLAMA_LLAMA_CPP_REV`. This crate builds
+//! `common` from that same tree, so it needs no submodule of its own. A local
+//! `llama.cpp` directory is a development fallback.
 //!
-//! The build records the submodule commit in `LLAMA_CPP_COMMIT` and
+//! The build records the revision in `LLAMA_CPP_COMMIT` and
 //! `LLAMA_CPP_BUILD_NUMBER`, and generates the `build-info.cpp` that
 //! `common.cpp` calls.
 
@@ -28,26 +29,41 @@ const EXCLUDED: &[&str] = &[
 fn main() {
     let manifest =
         PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is set"));
-    let llama = manifest.join("llama.cpp");
+
+    // Prefer the tree that llama-cpp-sys-2 built libllama from, so the two
+    // always match. Fall back to a local submodule for standalone development.
+    let llama = std::env::var_os("DEP_LLAMA_LLAMA_CPP_SOURCE")
+        .map(PathBuf::from)
+        .filter(|path| path.join("common").is_dir())
+        .unwrap_or_else(|| manifest.join("llama.cpp"));
 
     if !llama.join("common").is_dir() {
         panic!(
-            "the llama.cpp submodule is not initialized at {}\nrun: git submodule update --init --depth 1",
+            "no llama.cpp source tree at {}\n\
+             llama-cpp-sys-2 exports DEP_LLAMA_LLAMA_CPP_SOURCE; check that the pinned \
+             llama-cpp-sys-2 revision provides it, or add a llama.cpp submodule",
             llama.display()
         );
     }
 
-    for file in ["wrapper_common.cpp", "wrapper_common.h", "wrapper_utils.h", ".gitmodules"] {
+    for file in ["wrapper_common.cpp", "wrapper_common.h", "wrapper_utils.h"] {
         println!("cargo:rerun-if-changed={file}");
     }
     for dir in ["common", "include", "ggml/include", "src", "vendor"] {
         println!("cargo:rerun-if-changed={}", llama.join(dir).display());
     }
+    println!("cargo:rerun-if-env-changed=DEP_LLAMA_LLAMA_CPP_SOURCE");
+    println!("cargo:rerun-if-env-changed=DEP_LLAMA_LLAMA_CPP_REV");
 
-    // The commit is the version identity. `rev-list --count` is 1 for a shallow
-    // submodule, which is what this workspace uses.
-    let commit = git(&llama, &["rev-parse", "--short", "HEAD"]).unwrap_or_else(|| "unknown".to_string());
-    let build_number = git(&llama, &["rev-list", "--count", "HEAD"]).unwrap_or_else(|| "0".to_string());
+    // The exported revision identifies the tree. `rev-list --count` needs git
+    // metadata, which a Cargo checkout may not carry, so it may report 0.
+    let commit = std::env::var("DEP_LLAMA_LLAMA_CPP_REV")
+        .ok()
+        .filter(|rev| !rev.is_empty() && rev != "unknown")
+        .or_else(|| git(&llama, &["rev-parse", "HEAD"]))
+        .unwrap_or_else(|| "unknown".to_owned());
+    let build_number =
+        git(&llama, &["rev-list", "--count", "HEAD"]).unwrap_or_else(|| "0".to_owned());
     println!("cargo:rustc-env=LLAMA_CPP_COMMIT={commit}");
     println!("cargo:rustc-env=LLAMA_CPP_BUILD_NUMBER={build_number}");
 
@@ -56,12 +72,20 @@ fn main() {
     std::fs::write(&build_info, build_info_source(&commit, &build_number))
         .unwrap_or_else(|err| panic!("cannot write {}: {err}", build_info.display()));
 
+    // The wrapper includes paths of the form `llama.cpp/...`, so the parent of
+    // the source tree is on the include path.
+    let parent = llama
+        .parent()
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| manifest.clone());
+
     let mut build = cc::Build::new();
     build
         .cpp(true)
         .std("c++17")
         .pic(true)
         .warnings(false)
+        .include(&parent)
         .include(&llama)
         .include(llama.join("common"))
         .include(llama.join("include"))
@@ -76,7 +100,7 @@ fn main() {
     build.compile("llama_cpp_common");
 }
 
-/// The `build-info.cpp` that `common.cpp` expects, with the submodule commit.
+/// The `build-info.cpp` that `common.cpp` expects, with the llama.cpp revision.
 fn build_info_source(commit: &str, build_number: &str) -> String {
     format!(
         r#"#include "build-info.h"

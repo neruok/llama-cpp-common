@@ -16,19 +16,19 @@ From the `neruok/llama-cpp-rs` fork, behind its `common` feature:
 
 ## How it builds
 
-The crate uses llama.cpp as a git submodule and builds the `common` subset it
-needs with `cc`. It links `libllama` and the ggml libraries from
-`llama-cpp-sys-2`. The submodule is pinned to the llama.cpp commit that
-`llama-cpp-sys-2` pins. Run `git submodule update --init --depth 1` before a
-build.
+The crate builds the llama.cpp `common` subset it needs with `cc`. It uses the
+llama.cpp source tree that `llama-cpp-sys-2` exports
+(`DEP_LLAMA_LLAMA_CPP_SOURCE`), so it needs no submodule of its own. It links
+the `libllama` and ggml libraries from the same `llama-cpp-sys-2` build, so the
+`common` sources and `libllama` always come from one revision. A local
+`llama.cpp` directory is a development fallback.
 
 ## Versioning
 
-The build records the `llama.cpp` submodule commit in `LLAMA_CPP_COMMIT` and
-`LLAMA_CPP_BUILD_NUMBER`. `llama-cpp-rs` exposes its pinned commit only as a
-gitlink, so nothing checks the two submodule commits against each other. A
-mismatch shows as a link error. Keep this submodule pinned to the commit that
-`llama-cpp-sys-2` pins.
+The build records the llama.cpp revision in `LLAMA_CPP_COMMIT` and
+`LLAMA_CPP_BUILD_NUMBER`, taken from `DEP_LLAMA_LLAMA_CPP_REV`. Because the
+source tree and `libllama` come from the same `llama-cpp-sys-2` build, there is
+no separate submodule to drift.
 
 ## Dependency on raw handles
 
