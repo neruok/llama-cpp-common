@@ -17,3 +17,11 @@ pub mod speculative;
 mod sys;
 
 pub use grammar::json_schema_to_grammar;
+
+/// The pinned llama.cpp commit (short form), recorded at build time from the
+/// `llama.cpp` submodule.
+pub const LLAMA_CPP_COMMIT: &str = env!("LLAMA_CPP_COMMIT");
+
+/// The llama.cpp commit count, recorded at build time. A shallow submodule
+/// reports `1`.
+pub const LLAMA_CPP_BUILD_NUMBER: &str = env!("LLAMA_CPP_BUILD_NUMBER");

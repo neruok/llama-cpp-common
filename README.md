@@ -22,6 +22,14 @@ needs with `cc`. It links `libllama` and the ggml libraries from
 `llama-cpp-sys-2` pins. Run `git submodule update --init --depth 1` before a
 build.
 
+## Versioning
+
+The build records the `llama.cpp` submodule commit in `LLAMA_CPP_COMMIT` and
+`LLAMA_CPP_BUILD_NUMBER`. `llama-cpp-rs` exposes its pinned commit only as a
+gitlink, so nothing checks the two submodule commits against each other. A
+mismatch shows as a link error. Keep this submodule pinned to the commit that
+`llama-cpp-sys-2` pins.
+
 ## Dependency on raw handles
 
 The wrapper needs `llama_model *` and `llama_context *`. `llama-cpp-2` keeps
